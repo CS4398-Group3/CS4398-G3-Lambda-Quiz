@@ -337,11 +337,11 @@ const states = {
     QUIZ: `_QUIZ`,
 };
 
-const welcomeMessage = `Welcome to the United States Quiz Game!  You can ask me about any of the fifty states and their capitals, or you can ask me to start a quiz.  What would you like to do?`;
-const startQuizMessage = `OK.  I will ask you 10 questions about the United States. `;
-const exitSkillMessage = `Thank you for playing the United States Quiz Game!  Let's play again soon!`;
-const repromptSpeech = `Which other state or capital would you like to know about?`;
-const helpMessage = `I know lots of things about the United States.  You can ask me about a state or a capital, and I'll tell you what I know.  You can also test your knowledge by asking me to start a quiz.  What would you like to do?`;
+const welcomeMessage = `Welcome to ExamBot!  You can ask me what topics you can study, or you can ask me to start a topic quiz.  What would you like to do?`;
+const startQuizMessage = `OK.  I will ask you 10 questions. `;
+const exitSkillMessage = `Thank you for using Exam Bot!  Good Luck!`;
+const repromptSpeech = `What other topic would you like to Study?`;
+const helpMessage = `You can test your knowledge by asking me to start a topic quiz.  What would you like to do?`;
 const useCardsFlag = true;
 
 /* HELPER FUNCTIONS */
