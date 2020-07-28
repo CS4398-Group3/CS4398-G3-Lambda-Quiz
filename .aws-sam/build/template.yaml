@@ -13,7 +13,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: HelloWorldFunction
-      Handler: exports.handler
+      Handler: app.handler
       Runtime: nodejs12.x
       Events:
         HelloWorld:
@@ -22,19 +22,15 @@ Resources:
             Path: /hello
             Method: get
 Outputs:
-  HelloWorldApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World function
-    Value:
-      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
-  HelloWorldFunction:
-    Description: Hello World Lambda Function ARN
+  ExamPrepBotFunction:
+    Description: Exam Prep Bot Lambda Function ARN
     Value:
       Fn::GetAtt:
-      - HelloWorldFunction
+      - ExamPrepBotFunction
       - Arn
-  HelloWorldFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
+  ExamPrepBotIamRole:
+    Description: Exam Prep Bot created for Exam Quiz function
     Value:
       Fn::GetAtt:
-      - HelloWorldFunctionRole
+      - ExamPrepFunctionRole
       - Arn
