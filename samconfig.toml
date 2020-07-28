@@ -2,9 +2,9 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "ExamBotQuiz"
+stack_name = "ExamBotv13"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-855935ly5yob"
-s3_prefix = "ExamBotQuiz"
+s3_prefix = "ExamBotv13"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"

@@ -9,28 +9,22 @@ Globals:
   Function:
     Timeout: 3
 Resources:
-  HelloWorldFunction:
+  ExamBotFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: HelloWorldFunction
+      CodeUri: ExamBotFunction
       Handler: app.handler
       Runtime: nodejs12.x
-      Events:
-        HelloWorld:
-          Type: Api
-          Properties:
-            Path: /hello
-            Method: get
 Outputs:
-  ExamPrepBotFunction:
-    Description: Exam Prep Bot Lambda Function ARN
+  ExamBotFunction:
+    Description: Hello World Lambda Function ARN
     Value:
       Fn::GetAtt:
-      - ExamPrepBotFunction
+      - ExamBotFunction
       - Arn
-  ExamPrepBotIamRole:
-    Description: Exam Prep Bot created for Exam Quiz function
+  ExamBotFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
     Value:
       Fn::GetAtt:
-      - ExamPrepFunctionRole
+      - ExamBotFunctionRole
       - Arn
