@@ -1,0 +1,19 @@
+{
+  "name": "ExamPrepBot",
+  "version": "1.0.0",
+  "description": "Alexa ExamPrepBot Lambda",
+  "main": "app.js",
+  "repository": "https://github.com/CS4398-Group3/CS4398-G3-Lambda-Quiz",
+  "author": "SAM CLI",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0"
+  },
+  "scripts": {
+    "test": "mocha tests/unit/"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4"
+  }
+}
