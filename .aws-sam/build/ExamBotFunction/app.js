@@ -39,7 +39,6 @@ const QuizHandler = {
         if (supportsDisplay(handlerInput)) {
             const title = `Question #${attributes.counter}`;
             const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getQuestionWithoutOrdinal(property, item)).getTextContent();
-            const backgroundImage = new Alexa.ImageHelper().addImageInstance(getBackgroundImage(attributes.quizItem.Abbreviation)).getImage();
             const itemList = [];
             getAndShuffleMultipleChoiceAnswers(attributes.selectedItemIndex, item, property).forEach((x, i) => {
                 itemList.push(
@@ -53,7 +52,6 @@ const QuizHandler = {
                 type : 'ListTemplate1',
                 token : 'Question',
                 backButton : 'hidden',
-                backgroundImage,
                 title,
                 listItems : itemList,
             });
@@ -86,19 +84,15 @@ const DefinitionHandler = {
             if (useCardsFlag) {
                 response.withStandardCard(
                     getCardTitle(item),
-                    getTextDescription(item),
-                    getSmallImage(item),
-                    getLargeImage(item))
+                    getTextDescription(item))
             }
 
             if(supportsDisplay(handlerInput)) {
-                const image = new Alexa.ImageHelper().addImageInstance(getLargeImage(item)).getImage();
                 const title = getCardTitle(item);
                 const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getTextDescription(item, "<br/>")).getTextContent();
                 response.addRenderTemplateDirective({
                     type: 'BodyTemplate2',
                     backButton: 'visible',
-                    image,
                     title,
                     textContent: primaryText,
                 });
@@ -132,8 +126,8 @@ const QuizAnswerHandler = {
         const attributes = handlerInput.attributesManager.getSessionAttributes();
         const response = handlerInput.responseBuilder;
 
-        var speakOutput = ``;
-        var repromptOutput = ``;
+        let speakOutput = ``;
+        let repromptOutput = ``;
         const item = attributes.quizItem;
         const property = attributes.quizProperty;
         const isCorrect = compareSlots(handlerInput.requestEnvelope.request.intent.slots, item[property]);
@@ -147,7 +141,7 @@ const QuizAnswerHandler = {
         }
 
         speakOutput += getAnswer(property, item);
-        var question = ``;
+        let question = ``;
         //IF YOUR QUESTION COUNT IS LESS THAN 10, WE NEED TO ASK ANOTHER QUESTION.
         if (attributes.counter < 10) {
             speakOutput += getCurrentScore(attributes.quizScore, attributes.counter);
@@ -158,7 +152,6 @@ const QuizAnswerHandler = {
             if (supportsDisplay(handlerInput)) {
                 const title = `Question #${attributes.counter}`;
                 const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getQuestionWithoutOrdinal(attributes.quizProperty, attributes.quizItem)).getTextContent();
-                const backgroundImage = new Alexa.ImageHelper().addImageInstance(getBackgroundImage(attributes.quizItem.Abbreviation)).getImage();
                 const itemList = [];
                 getAndShuffleMultipleChoiceAnswers(attributes.selectedItemIndex, attributes.quizItem, attributes.quizProperty).forEach((x, i) => {
                     itemList.push(
@@ -172,7 +165,6 @@ const QuizAnswerHandler = {
                     type : 'ListTemplate1',
                     token : 'Question',
                     backButton : 'hidden',
-                    backgroundImage,
                     title,
                     listItems : itemList,
                 });
@@ -285,8 +277,6 @@ const ErrorHandler = {
 
 /* CONSTANTS */
 const skillBuilder = Alexa.SkillBuilders.custom();
-const imagePath = "https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/quiz-game/state_flag/{0}x{1}/{2}._TTH_.png";
-const backgroundImagePath = "https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/quiz-game/state_flag/{0}x{1}/{2}._TTH_.png"
 const speechConsCorrect = ['Booya', 'All righty', 'Bam', 'Bazinga', 'Bingo', 'Boom', 'Bravo', 'Cha Ching', 'Cheers', 'Dynomite', 'Hip hip hooray', 'Hurrah', 'Hurray', 'Huzzah', 'Oh dear.  Just kidding.  Hurray', 'Kaboom', 'Kaching', 'Oh snap', 'Phew','Righto', 'Way to go', 'Well done', 'Whee', 'Woo hoo', 'Yay', 'Wowza', 'Yowsa'];
 const speechConsWrong = ['Argh', 'Aw man', 'Blarg', 'Blast', 'Boo', 'Bummer', 'Darn', "D'oh", 'Dun dun dun', 'Eek', 'Honk', 'Le sigh', 'Mamma mia', 'Oh boy', 'Oh dear', 'Oof', 'Ouch', 'Ruh roh', 'Shucks', 'Uh oh', 'Wah wah', 'Whoops a daisy', 'Yikes'];
 const data = [
@@ -381,26 +371,6 @@ function getFinalScore(score, counter) {
 
 function getCardTitle(item) {
     return item.StateName;
-}
-
-function getSmallImage(item) {
-    return `https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/quiz-game/state_flag/720x400/${item.Abbreviation}._TTH_.png`;
-}
-
-function getLargeImage(item) {
-    return `https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/quiz-game/state_flag/1200x800/${item.Abbreviation}._TTH_.png`;
-}
-
-function getImage(height, width, label) {
-    return imagePath.replace("{0}", height)
-        .replace("{1}", width)
-        .replace("{2}", label);
-}
-
-function getBackgroundImage(label, height = 1024, width = 600) {
-    return backgroundImagePath.replace("{0}", height)
-        .replace("{1}", width)
-        .replace("{2}", label);
 }
 
 function getSpeechDescription(item) {
