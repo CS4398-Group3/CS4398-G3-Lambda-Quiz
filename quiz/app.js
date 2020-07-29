@@ -1,6 +1,16 @@
 const Alexa = require('ask-sdk-core');
-//const AWS = require('aws-sdk')
-//const rdsDataService = new AWS.RDSDataService()
+const AWS = require('aws-sdk')
+const rdsDataService = new AWS.RDSDataService()
+
+// prepare SQL command
+let sqlParams = {
+    secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
+    resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
+    sql: 'SELECT topicid, questionid, question FROM question;',
+    database: 'ExamBot',
+    includeResultMetadata: true
+}
+
 
 /* INTENT HANDLERS */
 const LaunchRequestHandler = {
@@ -30,7 +40,7 @@ const QuizHandler = {
         attributes.state = states.QUIZ;
         attributes.counter = 0;
         attributes.quizScore = 0;
-/*
+
         // run SQL command
         rdsDataService.executeStatement(sqlParams, function (err, data) {
             if (err) {
@@ -66,7 +76,7 @@ const QuizHandler = {
                 callback(null, rows)
             }
         })
-*/
+
         var question = askQuestion(handlerInput);
         var speakOutput = startQuizMessage + question;
         var repromptOutput = question;
@@ -573,15 +583,6 @@ function shuffle(array) {
         array[randomIndex] = temporaryValue;
     }
     return array;
-}
-
-// prepare SQL command
-let sqlParams = {
-    secretArn: '[SecretARN]',
-    resourceArn: '[ClusterARN]',
-    sql: 'SHOW TABLES;',
-    database: 'information_schema',
-    includeResultMetadata: true
 }
 
 
