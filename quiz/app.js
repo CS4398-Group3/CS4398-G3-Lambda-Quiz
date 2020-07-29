@@ -31,7 +31,7 @@ const QuizHandler = {
         console.log("Inside QuizHandler");
         console.log(JSON.stringify(request));
         return request.type === "IntentRequest" &&
-            (request.intent.name === "QuizIntent" || request.intent.name === "AMAZON.StartOverIntent");
+            (request.intent.name === "StartQuizIntent" || request.intent.name === "AMAZON.StartOverIntent");
     },
     handle(handlerInput) {
         console.log("Inside QuizHandler - handle");
