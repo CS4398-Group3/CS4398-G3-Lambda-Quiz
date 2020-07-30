@@ -53,7 +53,7 @@ const QuizHandler = {
         attributes.state = states.QUIZ;
         attributes.counter = 0;
         attributes.quizScore = 0;
-/*
+
         // run SQL command
         rdsDataService.executeStatement(sqlParams, function (err, data) {
             if (err) {
@@ -89,7 +89,7 @@ const QuizHandler = {
                 //callback(null, rows)
             }
         })
-*/
+
         var question = askQuestion(handlerInput);
         var speakOutput = startQuizMessage + question;
         var repromptOutput = question;
