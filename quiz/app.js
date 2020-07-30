@@ -3,7 +3,7 @@ const AWS = require('aws-sdk')
 const rdsDataService = new AWS.RDSDataService()
 
 // prepare SQL command
-let sqlParams = {
+let sqlParamsGetQuestions = {
     secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
     resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
     sql: 'SELECT topicid, questionid, question FROM question;',
@@ -11,6 +11,13 @@ let sqlParams = {
     includeResultMetadata: true
 }
 
+let sqlParamsGetTopics = {
+    secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
+    resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
+    sql: 'SELECT topicid, topicname FROM topics;',
+    database: 'ExamBot',
+    includeResultMetadata: true
+}
 
 /* INTENT HANDLERS */
 const LaunchRequestHandler = {
@@ -46,7 +53,7 @@ const QuizHandler = {
         return request.type === "IntentRequest" &&
             (request.intent.name === "StartQuizIntent" || request.intent.name === "AMAZON.StartOverIntent");
     },
-    handle(handlerInput) {
+    async handle(handlerInput) {
         console.log("Inside QuizHandler - handle");
         const attributes = handlerInput.attributesManager.getSessionAttributes();
         const response = handlerInput.responseBuilder;
@@ -55,7 +62,7 @@ const QuizHandler = {
         attributes.quizScore = 0;
 
         // run SQL command
-        rdsDataService.executeStatement(sqlParams, function (err, data) {
+        let data = await rdsDataService.executeStatement(sqlParamsGetQuestions, function (err, data) {
             if (err) {
                 // error
                 console.log(err)
@@ -63,7 +70,7 @@ const QuizHandler = {
             } else {
                 // init
                 var rows = []
-                var cols =[]
+                var cols = []
 
                 // build an array of columns
                 data.columnMetadata.map((v, i) => {
@@ -74,23 +81,38 @@ const QuizHandler = {
                 data.records.map((r) => {
                     var row = {}
                     r.map((v, i) => {
-                        if (v.stringValue !== "undefined") { row[cols[i]] = v.stringValue; }
-                        else if (v.blobValue !== "undefined") { row[cols[i]] = v.blobValue; }
-                        else if (v.doubleValue !== "undefined") { row[cols[i]] = v.doubleValue; }
-                        else if (v.longValue !== "undefined") { row[cols[i]] = v.longValue; }
-                        else if (v.booleanValue !== "undefined") { row[cols[i]] = v.booleanValue; }
-                        else if (v.isNull) { row[cols[i]] = null; }
+                        if (v.stringValue !== "undefined") {
+                            row[cols[i]] = v.stringValue;
+                        } else if (v.blobValue !== "undefined") {
+                            row[cols[i]] = v.blobValue;
+                        } else if (v.doubleValue !== "undefined") {
+                            row[cols[i]] = v.doubleValue;
+                        } else if (v.longValue !== "undefined") {
+                            row[cols[i]] = v.longValue;
+                        } else if (v.booleanValue !== "undefined") {
+                            row[cols[i]] = v.booleanValue;
+                        } else if (v.isNull) {
+                            row[cols[i]] = null;
+                        }
                     })
                     rows.push(row)
                 })
 
                 // done
-                console.log('Found rows: ' + rows.length)
+                //console.log('Found rows: ' + rows.length)
+                //console.log(rows[1])
+                //console.log(rows[1].question)
+                //console.log(rows[1].question);
+                //question = rows[1].question;
+                //console.log(question);
                 //callback(null, rows)
+                return rows;
             }
-        })
+        }).promise()
 
-        var question = askQuestion(handlerInput);
+        //var question = askQuestion(handlerInput);
+        var question = data[1].question;
+        console.log(question);
         var speakOutput = startQuizMessage + question;
         var repromptOutput = question;
 
@@ -104,17 +126,17 @@ const QuizHandler = {
             getAndShuffleMultipleChoiceAnswers(attributes.selectedItemIndex, item, property).forEach((x, i) => {
                 itemList.push(
                     {
-                        "token" : x,
-                        "textContent" : new Alexa.PlainTextContentHelper().withPrimaryText(x).getTextContent(),
+                        "token": x,
+                        "textContent": new Alexa.PlainTextContentHelper().withPrimaryText(x).getTextContent(),
                     }
                 );
             });
             response.addRenderTemplateDirective({
-                type : 'ListTemplate1',
-                token : 'Question',
-                backButton : 'hidden',
+                type: 'ListTemplate1',
+                token: 'Question',
+                backButton: 'hidden',
                 title,
-                listItems : itemList,
+                listItems: itemList,
             });
         }
 
@@ -340,7 +362,7 @@ const ErrorHandler = {
 const skillBuilder = Alexa.SkillBuilders.custom();
 const speechConsCorrect = ['Booya', 'All righty', 'Bam', 'Bazinga', 'Bingo', 'Boom', 'Bravo', 'Cha Ching', 'Cheers', 'Dynomite', 'Hip hip hooray', 'Hurrah', 'Hurray', 'Huzzah', 'Oh dear.  Just kidding.  Hurray', 'Kaboom', 'Kaching', 'Oh snap', 'Phew','Righto', 'Way to go', 'Well done', 'Whee', 'Woo hoo', 'Yay', 'Wowza', 'Yowsa'];
 const speechConsWrong = ['Argh', 'Aw man', 'Blarg', 'Blast', 'Boo', 'Bummer', 'Darn', "D'oh", 'Dun dun dun', 'Eek', 'Honk', 'Le sigh', 'Mamma mia', 'Oh boy', 'Oh dear', 'Oof', 'Ouch', 'Ruh roh', 'Shucks', 'Uh oh', 'Wah wah', 'Whoops a daisy', 'Yikes'];
-const data = [
+/*const data = [
     {StateName: 'Alabama', Abbreviation: 'AL', Capital: 'Montgomery', StatehoodYear: 1819, StatehoodOrder: 22},
     {StateName: 'Alaska', Abbreviation: 'AK', Capital: 'Juneau', StatehoodYear: 1959, StatehoodOrder: 49},
     {StateName: 'Arizona', Abbreviation: 'AZ', Capital: 'Phoenix', StatehoodYear: 1912, StatehoodOrder: 48},
@@ -392,7 +414,7 @@ const data = [
     {StateName: 'Wisconsin', Abbreviation: 'WI', Capital: 'Madison', StatehoodYear: 1848, StatehoodOrder: 30},
     {StateName: 'Wyoming', Abbreviation: 'WY', Capital: 'Cheyenne', StatehoodYear: 1890, StatehoodOrder: 44},
 ];
-
+*/
 const states = {
     START: `_START`,
     QUIZ: `_QUIZ`,
