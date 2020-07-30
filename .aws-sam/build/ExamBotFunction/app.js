@@ -40,13 +40,13 @@ const QuizHandler = {
         attributes.state = states.QUIZ;
         attributes.counter = 0;
         attributes.quizScore = 0;
-
+/*
         // run SQL command
         rdsDataService.executeStatement(sqlParams, function (err, data) {
             if (err) {
                 // error
                 console.log(err)
-                callback('Query Failed')
+                //callback('Query Failed')
             } else {
                 // init
                 var rows = []
@@ -73,10 +73,10 @@ const QuizHandler = {
 
                 // done
                 console.log('Found rows: ' + rows.length)
-                callback(null, rows)
+                //callback(null, rows)
             }
         })
-
+*/
         var question = askQuestion(handlerInput);
         var speakOutput = startQuizMessage + question;
         var repromptOutput = question;
