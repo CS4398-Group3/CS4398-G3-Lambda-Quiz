@@ -25,6 +25,19 @@ const LaunchRequestHandler = {
     },
 };
 
+const TopicRequestHandler = {
+    canHandle(handlerInput) {
+        const request = handlerInput.requestEnvelope.request;
+        console.log("Inside TopicRequestHandler");
+        console.log(JSON.stringify(request));
+        return request.type === "TopicRequest" &&
+            (request.intent.name === "TopicIntent");
+    },
+    handle(handlerInput) {
+        return handlerInput.responseBuilder.getResponse();
+    },
+};
+
 const QuizHandler = {
     canHandle(handlerInput) {
         const request = handlerInput.requestEnvelope.request;
@@ -591,6 +604,7 @@ function shuffle(array) {
 exports.handler = skillBuilder
     .addRequestHandlers(
         LaunchRequestHandler,
+        TopicRequestHandler,
         QuizHandler,
         DefinitionHandler,
         QuizAnswerHandler,
