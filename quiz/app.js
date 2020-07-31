@@ -58,6 +58,8 @@ const TopicRequestHandler = {
             //this.speak(speechOutput);
         }
 
+        speechOutput = topic;
+
         return response.speak(speechOutput)
             .reprompt(speechOutput)
             .getResponse();
