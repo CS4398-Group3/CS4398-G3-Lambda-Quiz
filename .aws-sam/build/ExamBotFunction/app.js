@@ -37,13 +37,15 @@ const TopicRequestHandler = {
         const request = handlerInput.requestEnvelope.request;
         console.log("Inside TopicRequestHandler");
         console.log(JSON.stringify(request));
-        return request.type === "TopicRequest" &&
+        return request.type === "IntentRequest" &&
             (request.intent.name === "TopicIntent");
     },
     async handle(handlerInput) {
+        const attributes = handlerInput.attributesManager.getSessionAttributes();
+        const response = handlerInput.responseBuilder;
         var results = await queryTopics();
 
-        speechOutput = results[1].topicName;
+        speechOutput = 'in topic';results[1].topicName;
 
         /*
         for (var i = 0; i < results.length; i++) {
