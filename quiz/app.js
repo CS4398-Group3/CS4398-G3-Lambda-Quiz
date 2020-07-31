@@ -91,7 +91,7 @@ const QuizHandler = {
 
         const item = attributes.quizItem;
         const property = attributes.quizProperty;
-
+/*
         if (supportsDisplay(handlerInput)) {
             const title = `Question #${attributes.counter}`;
             const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getQuestionWithoutOrdinal(property, item)).getTextContent();
@@ -112,7 +112,7 @@ const QuizHandler = {
                 listItems: itemList,
             });
         }
-
+*/
         return response.speak(speakOutput)
             .reprompt(repromptOutput)
             .getResponse();
@@ -142,7 +142,7 @@ const DefinitionHandler = {
                     getCardTitle(item),
                     getTextDescription(item))
             }
-
+/*
             if(supportsDisplay(handlerInput)) {
                 const title = getCardTitle(item);
                 const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getTextDescription(item, "<br/>")).getTextContent();
@@ -153,6 +153,7 @@ const DefinitionHandler = {
                     textContent: primaryText,
                 });
             }
+  */
             return response.speak(getSpeechDescription(item))
                 .reprompt(repromptSpeech)
                 .getResponse();
@@ -204,7 +205,7 @@ const QuizAnswerHandler = {
             question = askQuestion(handlerInput);
             speakOutput += question;
             repromptOutput = question;
-
+/*
             if (supportsDisplay(handlerInput)) {
                 const title = `Question #${attributes.counter}`;
                 const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getQuestionWithoutOrdinal(attributes.quizProperty, attributes.quizItem)).getTextContent();
@@ -225,12 +226,15 @@ const QuizAnswerHandler = {
                     listItems : itemList,
                 });
             }
+
+ */
             return response.speak(speakOutput)
                 .reprompt(repromptOutput)
                 .getResponse();
         }
         else {
             speakOutput += getFinalScore(attributes.quizScore, attributes.counter) + exitSkillMessage;
+            /*
             if(supportsDisplay(handlerInput)) {
                 const title = 'Thank you for playing';
                 const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getFinalScore(attributes.quizScore, attributes.counter)).getTextContent();
@@ -240,7 +244,7 @@ const QuizAnswerHandler = {
                     title,
                     textContent: primaryText,
                 });
-            }
+            }*/
             return response.speak(speakOutput).getResponse();
         }
     },
