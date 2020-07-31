@@ -45,16 +45,18 @@ const TopicRequestHandler = {
         const response = handlerInput.responseBuilder;
         var results = await queryTopics();
 
-        speechOutput = 'in topic';results[1].topicName;
+        //results[1].topicname;
+        console.log(results);
+        console.log(results[1].topicName);
+        speechOutput = results[1].topicName;
 
-        /*
         for (var i = 0; i < results.length; i++) {
             var topic = results[i].topicName;
-            speechOutput = topic;
-            console.log(speechOutput);
+           // speechOutput = topic;
+            console.log(topic);
             //this.speak(speechOutput);
         }
-*/
+
         return response.speak(speechOutput)
             .reprompt(speechOutput)
             .getResponse();
