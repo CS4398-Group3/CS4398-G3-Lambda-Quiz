@@ -52,10 +52,10 @@ const TopicRequestHandler = {
         var topic = ' ';
 
         for (var i = 0; i < results.length; i++) {
-            if (i != results.length - 1)
-                topic += results[i].topicName + ', ';
-            else
-                topic += 'and ' + result[i].topicName;
+            if (i != results.length - 1) {
+                topic += results[i].topicName + ', '; }
+            else {
+                topic += 'and ' + result[i].topicName; }
            // speechOutput = topic;
             console.log(topic);
             //this.speak(speechOutput);
