@@ -49,7 +49,7 @@ const TopicRequestHandler = {
         console.log(results);
         console.log(results[1].topicName);
         speechOutput = results[1].topicName;
-        var topic;
+        var topic = ' ';
 
         for (var i = 0; i < results.length; i++) {
             topic += results[i].topicName + ', ';
