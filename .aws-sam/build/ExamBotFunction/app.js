@@ -50,9 +50,10 @@ const TopicRequestHandler = {
         console.log(results[1].topicName);
         speechOutput = results[1].topicName;
         var topic = ' ';
+        const topicNum = results.length;
 
-        for (var i = 0; i < results.length; i++) {
-            // if (i != results.length - 1) {
+        for (var i = 0; i < topicNum; i++) {
+            // if (i !== (topicNum - 1)) {
             //     topic += results[i].topicName + ', '; }
             // else {
             //     topic += 'and ' + result[i].topicName; }
@@ -62,8 +63,8 @@ const TopicRequestHandler = {
             //this.speak(speechOutput);
         }
 
-        // speechOutput = topicMessage + topic;
-        speechOutput = topic;
+         speechOutput = topicMessage + topic;
+        //speechOutput = topic;
 
         return response.speak(speechOutput)
             .reprompt(speechOutput)
@@ -358,7 +359,7 @@ const startQuizMessage = `OK.  I will ask you 10 questions. `;
 const exitSkillMessage = `Thank you for using Exam Bot!  Good Luck!`;
 const repromptSpeech = `What other topic would you like to Study?`;
 const helpMessage = `You can test your knowledge by asking me to start a topic quiz.  What would you like to do?`;
-//const topicMessage = 'Here are the topics I know: ';
+const topicMessage = 'Here are the topics I know: ';
 const useCardsFlag = true;
 
 /* HELPER FUNCTIONS */
