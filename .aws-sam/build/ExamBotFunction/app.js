@@ -53,12 +53,12 @@ const TopicRequestHandler = {
         const topicNum = results.length;
 
         for (var i = 0; i < topicNum; i++) {
-            // if (i !== (topicNum - 1)) {
-            //     topic += results[i].topicName + ', '; }
-            // else {
-            //     topic += 'and ' + result[i].topicName; }
+            if (i !== topicNum - 1) {
+                topic += results[i].topicName + ', '; }
+            else {
+                topic += 'and ' + results[i].topicName; }
            // speechOutput = topic;
-            topic += results[i].topicName + ', ';
+           //  topic += results[i].topicName + ', ';
             console.log(topic);
             //this.speak(speechOutput);
         }
@@ -73,6 +73,22 @@ const TopicRequestHandler = {
         //return handlerInput.responseBuilder.getResponse();
     },
 };
+
+// const TopicChoiceHandler = {
+//     canHandle(handlerInput) {
+//         return request.type == "IntentRequest" &&
+//             (request.intent.name == "TopicChoiceIntent");
+//     },
+//     handle(handlerInput) {
+//         const response = handlerInput.responseBuilder;
+//         //const choice = getItem(handlerInput.requestEnvelope.request.intent.slots); //copied from line 159
+//         //speechOutput = topicChoiceMessage + choice; //choice is the chosen topic by user
+//         speechOutput = topicChoiceMessage;
+//
+//         return response.speak(speechOutput)
+//             .reprompt(helpMessage);
+//     }
+// }
 
 const QuizHandler = {
     canHandle(handlerInput) {
@@ -360,6 +376,7 @@ const exitSkillMessage = `Thank you for using Exam Bot!  Good Luck!`;
 const repromptSpeech = `What other topic would you like to Study?`;
 const helpMessage = `You can test your knowledge by asking me to start a topic quiz.  What would you like to do?`;
 const topicMessage = 'Here are the topics I know: ';
+const topicChoiceMessage = 'Okay, I will create a quiz for ';
 const useCardsFlag = true;
 
 /* HELPER FUNCTIONS */
@@ -633,6 +650,7 @@ exports.handler = skillBuilder
     .addRequestHandlers(
         LaunchRequestHandler,
         TopicRequestHandler,
+        // TopicChoiceHandler,
         QuizHandler,
         DefinitionHandler,
         QuizAnswerHandler,
