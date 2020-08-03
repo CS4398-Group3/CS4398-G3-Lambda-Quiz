@@ -83,13 +83,15 @@ const TopicChoiceHandler = {
     },
     handle(handlerInput) {
         const response = handlerInput.responseBuilder;
-        const choice = getItem(handlerInput.requestEnvelope.request.intent.slots); //copied from item in DefinitionHandler
+        const choice = handlerInput.requestEnvelope.request.intent.slots;
+        // const topicChoice = choice[0].value.toString().toLowerCase();
+        const topicChoice = choice[0].value;
+        console.log("Inside TopicChoiceHandler - handle");
 
-        speechOutput = topicChoiceMessage + choice + quizPromptMessage; //choice is the chosen topic by user
-        // speechOutput = topicChoiceMessage;
+        console.log(JSON.stringify(topicChoice));
 
-        // return response.speak(speechOutput)
-        //     .reprompt(helpMessage);
+        //speechOutput = topicChoiceMessage + choice + quizPromptMessage; //choice is the chosen topic by user
+        speechOutput = topicChoiceMessage;
 
         return response.speak(speechOutput)
             .reprompt(helpMessage)
