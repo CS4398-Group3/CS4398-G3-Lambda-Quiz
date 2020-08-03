@@ -56,7 +56,7 @@ const TopicRequestHandler = {
             if (i !== topicNum - 1) {
                 topic += results[i].topicName + ', '; }
             else {
-                topic += 'and ' + results[i].topicName; }
+                topic += 'and ' + results[i].topicName + '.'; }
            // speechOutput = topic;
            //  topic += results[i].topicName + ', ';
             console.log(topic);
@@ -74,21 +74,28 @@ const TopicRequestHandler = {
     },
 };
 
-// const TopicChoiceHandler = {
-//     canHandle(handlerInput) {
-//         return request.type == "IntentRequest" &&
-//             (request.intent.name == "TopicChoiceIntent");
-//     },
-//     handle(handlerInput) {
-//         const response = handlerInput.responseBuilder;
-//         //const choice = getItem(handlerInput.requestEnvelope.request.intent.slots); //copied from line 159
-//         //speechOutput = topicChoiceMessage + choice; //choice is the chosen topic by user
-//         speechOutput = topicChoiceMessage;
-//
-//         return response.speak(speechOutput)
-//             .reprompt(helpMessage);
-//     },
-// };
+const TopicChoiceHandler = {
+    canHandle(handlerInput) {
+        const request = handlerInput.requestEnvelope.request;
+        console.log("Inside TopicChoiceHandler");
+        return request.type === "IntentRequest" &&
+            (request.intent.name === "TopicChoiceIntent");
+    },
+    handle(handlerInput) {
+        const response = handlerInput.responseBuilder;
+        const choice = getItem(handlerInput.requestEnvelope.request.intent.slots); //copied from item in DefinitionHandler
+
+        speechOutput = topicChoiceMessage + choice + quizPromptMessage; //choice is the chosen topic by user
+        // speechOutput = topicChoiceMessage;
+
+        // return response.speak(speechOutput)
+        //     .reprompt(helpMessage);
+
+        return response.speak(speechOutput)
+            .reprompt(helpMessage)
+            .getResponse();
+    },
+};
 
 const QuizHandler = {
     canHandle(handlerInput) {
@@ -377,6 +384,7 @@ const repromptSpeech = `What other topic would you like to Study?`;
 const helpMessage = `You can test your knowledge by asking me to start a topic quiz.  What would you like to do?`;
 const topicMessage = 'Here are the topics I know: ';
 const topicChoiceMessage = 'Okay, I will create a quiz for ';
+const quizPromptMessage = '. When you are ready, say start.';
 const useCardsFlag = true;
 
 /* HELPER FUNCTIONS */
@@ -650,7 +658,7 @@ exports.handler = skillBuilder
     .addRequestHandlers(
         LaunchRequestHandler,
         TopicRequestHandler,
-        // TopicChoiceHandler,
+        TopicChoiceHandler,
         QuizHandler,
         DefinitionHandler,
         QuizAnswerHandler,
