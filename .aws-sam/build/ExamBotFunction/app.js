@@ -87,8 +87,8 @@ const TopicRequestHandler = {
 //
 //         return response.speak(speechOutput)
 //             .reprompt(helpMessage);
-//     }
-// }
+//     },
+// };
 
 const QuizHandler = {
     canHandle(handlerInput) {
