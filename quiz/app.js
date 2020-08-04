@@ -92,8 +92,10 @@ const TopicChoiceHandler = {
         console.log("Inside TopicChoiceHandler - handle");
         console.log(topicChoice);
         //console.log(JSON.stringify(topicChoice));
+        chosenTopic = topicChoice.value;
+        console.log(chosenTopic);
 
-        speechOutput = topicChoiceMessage + topicChoice.value + quizPromptMessage;
+        speechOutput = topicChoiceMessage + chosenTopic + quizPromptMessage;
         // speechOutput = topicChoice.value;
 
         return response.speak(speechOutput)
@@ -112,6 +114,7 @@ const QuizHandler = {
     },
     async handle(handlerInput) {
         console.log("Inside QuizHandler - handle");
+        console.log(chosenTopic);
         const attributes = handlerInput.attributesManager.getSessionAttributes();
         const response = handlerInput.responseBuilder;
         attributes.state = states.QUIZ;
@@ -219,12 +222,14 @@ const QuizAnswerHandler = {
         console.log("Inside QuizAnswerHandler - handle");
         const attributes = handlerInput.attributesManager.getSessionAttributes();
         const response = handlerInput.responseBuilder;
+        console.log("Received attributes and response");
 
         let speakOutput = ``;
         let repromptOutput = ``;
         const item = attributes.quizItem;
         const property = attributes.quizProperty;
         const isCorrect = compareSlots(handlerInput.requestEnvelope.request.intent.slots, item[property]);
+        console.log("Created isCorrect");
 
         if (isCorrect) {
             speakOutput = getSpeechCon(true);
@@ -391,6 +396,9 @@ const topicMessage = 'Here are the topics I know: ';
 const topicChoiceMessage = 'Okay, I will create a quiz for ';
 const quizPromptMessage = '. When you are ready, say start.';
 const useCardsFlag = true;
+
+/* SAVED USER INPUTS */
+var chosenTopic = '';
 
 /* HELPER FUNCTIONS */
 
