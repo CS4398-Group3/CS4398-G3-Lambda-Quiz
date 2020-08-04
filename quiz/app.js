@@ -83,15 +83,16 @@ const TopicChoiceHandler = {
     },
     handle(handlerInput) {
         const response = handlerInput.responseBuilder;
-        const choice = handlerInput.requestEnvelope.request.intent.slots;
+        const choice = getItem(handlerInput.requestEnvelope.request.intent.slots);
         // const topicChoice = choice[0].value.toString().toLowerCase();
-        const topicChoice = choice[0].value;
+        //const topicChoice = choice[0].value;
+        const topicChoice = getTopic(choice);
         console.log("Inside TopicChoiceHandler - handle");
-
-        console.log(JSON.stringify(topicChoice));
+        console.log(topicChoice);
+        //console.log(JSON.stringify(topicChoice));
 
         //speechOutput = topicChoiceMessage + choice + quizPromptMessage; //choice is the chosen topic by user
-        speechOutput = topicChoiceMessage;
+        speechOutput = topicChoice;
 
         return response.speak(speechOutput)
             .reprompt(helpMessage)
@@ -487,6 +488,10 @@ function getFinalScore(score, counter) {
 
 function getCardTitle(item) {
     return item.StateName;
+}
+
+function getTopic(item) {
+    return item.Topic;
 }
 
 function getSpeechDescription(item) {
