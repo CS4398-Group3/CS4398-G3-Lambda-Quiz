@@ -2,22 +2,6 @@ const Alexa = require('ask-sdk-core');
 const AWS = require('aws-sdk')
 const rdsDataService = new AWS.RDSDataService()
 
-// prepare SQL command
-let sqlParamsGetQuestions = {
-    secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
-    resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
-    sql: 'SELECT topicid, questionid, question FROM question;',
-    database: 'ExamBot',
-    includeResultMetadata: true
-}
-
-let sqlParamsGetTopics = {
-    secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
-    resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
-    sql: 'SELECT topicid, topicName FROM topics;',
-    database: 'ExamBot',
-    includeResultMetadata: true
-}
 
 /* INTENT HANDLERS */
 const LaunchRequestHandler = {
@@ -108,43 +92,29 @@ const QuizHandler = {
         attributes.state = states.QUIZ;
         attributes.counter = 0;
         attributes.quizScore = 0;
+        attributes.questionID = 0;
 
 
         //var question = askQuestion(handlerInput);
-        var results = await queryQuestions();
-        var question = results[1].question;
+        console.log('immediately before db call');
+        var results;// = await queryQuestions(attributes.topic, attributes.counter);
+        console.log(results[0].questionID);
+        attributes.questionID = results[0].questionID;
+        attributes.question = results[0].question;
+        attributes.answer = results[0].answer;
+        var question = attributes.question;
         console.log(question);
         var speakOutput = startQuizMessage + question;
         var repromptOutput = question;
 
         const item = attributes.quizItem;
         const property = attributes.quizProperty;
-/*
-        if (supportsDisplay(handlerInput)) {
-            const title = `Question #${attributes.counter}`;
-            const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getQuestionWithoutOrdinal(property, item)).getTextContent();
-            const itemList = [];
-            getAndShuffleMultipleChoiceAnswers(attributes.selectedItemIndex, item, property).forEach((x, i) => {
-                itemList.push(
-                    {
-                        "token": x,
-                        "textContent": new Alexa.PlainTextContentHelper().withPrimaryText(x).getTextContent(),
-                    }
-                );
-            });
-            response.addRenderTemplateDirective({
-                type: 'ListTemplate1',
-                token: 'Question',
-                backButton: 'hidden',
-                title,
-                listItems: itemList,
-            });
-        }
-*/
+
+        handlerInput.attributesManager.setSessionAttributes(attributes);
         return response.speak(speakOutput)
             .reprompt(repromptOutput)
             .getResponse();
-    },
+    }
 };
 
 const DefinitionHandler = {
@@ -400,16 +370,24 @@ function supportsDisplay(handlerInput) {
     return hasDisplay;
 }
 
-async function queryQuestions(){
-    // run SQL command
-    let data = await rdsDataService.executeStatement(sqlParamsGetQuestions).promise()
+async function queryQuestions(topic, count){
 
-    var rows = []
-    var cols = []
+    let sqlParamsGetQuestions = {
+        secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
+        resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
+        sql: 'SELECT q.topicid, q.questionid, q.questionOrdinal, q.question, q.answer FROM questions q inner join topics where t.topicName = ' + topic + ' and q.questionOrdinal = ' + count + ';',
+        database: 'ExamBot',
+        includeResultMetadata: true
+    };
+    // run SQL command
+    let data = await rdsDataService.executeStatement(sqlParamsGetQuestions).promise();
+
+    var rows = [];
+    var cols = [];
 
     // build an array of columns
     data.columnMetadata.map((v, i) => {
-        cols.push(v.name)
+        cols.push(v.name);
     });
 
     // build an array of rows: { key=>value }
@@ -437,6 +415,14 @@ async function queryQuestions(){
 
 
 async function queryTopics(){
+    let sqlParamsGetTopics = {
+        secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
+        resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
+        sql: 'SELECT topicid, topicName FROM topics;',
+        database: 'ExamBot',
+        includeResultMetadata: true
+    }
+
     // run SQL command
     let data = await rdsDataService.executeStatement(sqlParamsGetTopics).promise()
 
