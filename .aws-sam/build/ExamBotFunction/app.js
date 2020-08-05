@@ -84,6 +84,7 @@ const TopicChoiceHandler = {
     handle(handlerInput) {
         const response = handlerInput.responseBuilder;
         const choice = getItem(handlerInput.requestEnvelope.request.intent.slots);
+        console.log(choice);
         // const topicChoice = choice[0].value.toString().toLowerCase();
         //const topicChoice = choice[0].value;
         const topicChoice = getTopic(choice);
