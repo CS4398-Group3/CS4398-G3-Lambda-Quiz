@@ -41,14 +41,11 @@ const TopicRequestHandler = {
             (request.intent.name === "TopicIntent");
     },
     async handle(handlerInput) {
-        const attributes = handlerInput.attributesManager.getSessionAttributes();
         const response = handlerInput.responseBuilder;
         var results = await queryTopics();
 
-        //results[1].topicname;
         console.log(results);
         console.log(results[1].topicName);
-        speechOutput = results[1].topicName;
         var topic = ' ';
         const topicNum = results.length;
 
@@ -57,20 +54,14 @@ const TopicRequestHandler = {
                 topic += results[i].topicName + ', '; }
             else {
                 topic += 'and ' + results[i].topicName + '.'; }
-           // speechOutput = topic;
-           //  topic += results[i].topicName + ', ';
             console.log(topic);
-            //this.speak(speechOutput);
         }
 
          speechOutput = topicMessage + topic;
-        //speechOutput = topic;
 
         return response.speak(speechOutput)
             .reprompt(speechOutput)
             .getResponse();
-
-        //return handlerInput.responseBuilder.getResponse();
     },
 };
 
@@ -82,18 +73,19 @@ const TopicChoiceHandler = {
             (request.intent.name === "TopicChoiceIntent");
     },
     handle(handlerInput) {
+        const attributes = handlerInput.attributesManager.getSessionAttributes();
         const response = handlerInput.responseBuilder;
-        const choice = getItem(handlerInput.requestEnvelope.request.intent.slots);
-        console.log(choice);
-        // const topicChoice = choice[0].value.toString().toLowerCase();
-        //const topicChoice = choice[0].value;
-        const topicChoice = getTopic(choice);
         console.log("Inside TopicChoiceHandler - handle");
+        console.log("Creating choice");
+        const choice = handlerInput.requestEnvelope.request.intent.slots;
+        console.log(choice);
+        const topicChoice = getTopic(choice);
         console.log(topicChoice);
         //console.log(JSON.stringify(topicChoice));
+        attributes.topic = topicChoice.value;
+        console.log(attributes.topic);
 
-        //speechOutput = topicChoiceMessage + choice + quizPromptMessage; //choice is the chosen topic by user
-        speechOutput = topicChoice;
+        speechOutput = topicChoiceMessage + attributes.topic + quizPromptMessage;
 
         return response.speak(speechOutput)
             .reprompt(helpMessage)
@@ -112,6 +104,7 @@ const QuizHandler = {
     async handle(handlerInput) {
         console.log("Inside QuizHandler - handle");
         const attributes = handlerInput.attributesManager.getSessionAttributes();
+        console.log(attributes.topic);
         const response = handlerInput.responseBuilder;
         attributes.state = states.QUIZ;
         attributes.counter = 0;
@@ -218,12 +211,16 @@ const QuizAnswerHandler = {
         console.log("Inside QuizAnswerHandler - handle");
         const attributes = handlerInput.attributesManager.getSessionAttributes();
         const response = handlerInput.responseBuilder;
+        console.log("Received attributes and response");
 
         let speakOutput = ``;
         let repromptOutput = ``;
         const item = attributes.quizItem;
         const property = attributes.quizProperty;
+        console.log("Created item and property");
+        console.log(item, property);
         const isCorrect = compareSlots(handlerInput.requestEnvelope.request.intent.slots, item[property]);
+        console.log("Created isCorrect");
 
         if (isCorrect) {
             speakOutput = getSpeechCon(true);
