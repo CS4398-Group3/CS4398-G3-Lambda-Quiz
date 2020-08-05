@@ -83,10 +83,9 @@ const TopicChoiceHandler = {
         console.log(topicChoice);
         //console.log(JSON.stringify(topicChoice));
         attributes.topic = topicChoice.value;
+        handlerInput.attributesManager.setSessionAttributes(attributes);
         console.log(attributes.topic);
-
-        speechOutput = topicChoiceMessage + attributes.topic + quizPromptMessage;
-
+        const speechOutput = topicChoiceMessage + attributes.topic + quizPromptMessage;
         return response.speak(speechOutput)
             .reprompt(helpMessage)
             .getResponse();

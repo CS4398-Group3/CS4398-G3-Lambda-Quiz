@@ -3,12 +3,7 @@ const AWS = require('aws-sdk')
 const rdsDataService = new AWS.RDSDataService()
 
 // prepare SQL command
-let sqlParamsGetQuestions = {
-    secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
-    resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
-    sql: 'SELECT topicid, questionid, question FROM question;',
-    database: 'ExamBot',
-    includeResultMetadata: true
+
 }
 
 let sqlParamsGetTopics = {
@@ -83,10 +78,9 @@ const TopicChoiceHandler = {
         console.log(topicChoice);
         //console.log(JSON.stringify(topicChoice));
         attributes.topic = topicChoice.value;
+        handlerInput.attributesManager.setSessionAttributes(attributes);
         console.log(attributes.topic);
-
-        speechOutput = topicChoiceMessage + attributes.topic + quizPromptMessage;
-
+        const speechOutput = topicChoiceMessage + attributes.topic + quizPromptMessage;
         return response.speak(speechOutput)
             .reprompt(helpMessage)
             .getResponse();
@@ -109,11 +103,15 @@ const QuizHandler = {
         attributes.state = states.QUIZ;
         attributes.counter = 0;
         attributes.quizScore = 0;
+        attributes.questionID = 0;
 
 
         //var question = askQuestion(handlerInput);
-        var results = await queryQuestions();
-        var question = results[1].question;
+        var results = await queryQuestions(attributes.topic, attributes.counter);
+        attributes.questionID = results[0].questionID;
+        attributes.question = results[0].question;
+        attributes.answer = results[0].answer;
+        var question = attributes.question;
         console.log(question);
         var speakOutput = startQuizMessage + question;
         var repromptOutput = question;
@@ -142,6 +140,7 @@ const QuizHandler = {
             });
         }
 */
+        handlerInput.attributesManager.setSessionAttributes(attributes);
         return response.speak(speakOutput)
             .reprompt(repromptOutput)
             .getResponse();
@@ -401,7 +400,15 @@ function supportsDisplay(handlerInput) {
     return hasDisplay;
 }
 
-async function queryQuestions(){
+async function queryQuestions(topic, count){
+
+    let sqlParamsGetQuestions = {
+        secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
+        resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
+        sql: 'SELECT q.topicid, q.questionid, q.questionOrdinal, q.question, q.answer FROM questions q inner join topics where t.topicName = '+topic+' and q.questionOrdinal = '+count+';',
+        database: 'ExamBot',
+        includeResultMetadata: true
+
     // run SQL command
     let data = await rdsDataService.executeStatement(sqlParamsGetQuestions).promise()
 
