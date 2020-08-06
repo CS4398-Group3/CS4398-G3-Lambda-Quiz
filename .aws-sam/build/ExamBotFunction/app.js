@@ -67,6 +67,7 @@ const TopicChoiceHandler = {
         console.log(topicChoice);
         //console.log(JSON.stringify(topicChoice));
         attributes.topic = topicChoice.value;
+        attributes.topicID = getTopicID(attributes.topic);
         handlerInput.attributesManager.setSessionAttributes(attributes);
         console.log(attributes.topic);
         const speechOutput = topicChoiceMessage + attributes.topic + quizPromptMessage;
@@ -97,7 +98,7 @@ const QuizHandler = {
 
         //var question = askQuestion(handlerInput);
         console.log('immediately before db call');
-        var results = await queryQuestions(attributes.topic, attributes.counter);
+        var results = await queryQuestions(attributes.topicID, attributes.counter);
         console.log('Immediately after db call');
         console.log(results);
         attributes.questionID = results[0].questionID;
@@ -371,12 +372,12 @@ function supportsDisplay(handlerInput) {
     return hasDisplay;
 }
 
-async function queryQuestions(topic, count){
+async function queryQuestions(topicID, count){
 
     let sqlParamsGetQuestions = {
         secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
         resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
-        sql: "SELECT q.topicid, q.questionid, q.question FROM question q inner join topics where topicName = '" + topic + "';",// and q.questionOrdinal = '" + count + "';",
+        sql: "SELECT q.topicid, q.questionid, q.question FROM question q where q.topicid = '" + topicID + "';",// and q.questionOrdinal = '" + count + "';",
         database: 'ExamBot',
         includeResultMetadata: true
     };
@@ -462,6 +463,51 @@ async function queryTopics(){
     return rows;
 }
 
+async function queryAnswers(topicID){
+    let sqlParamsGetTopics = {
+        secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
+        resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
+        sql: "SELECT topicid, answerid, answer FROM answers where topicid = '" + topicID + "';",
+        database: 'ExamBot',
+        includeResultMetadata: true
+    }
+
+    // run SQL command
+    let data = await rdsDataService.executeStatement(sqlParamsGetTopics).promise()
+
+    var rows = []
+    var cols = []
+
+    // build an array of columns
+    data.columnMetadata.map((v, i) => {
+        cols.push(v.name)
+    });
+
+    // build an array of rows: { key=>value }
+    data.records.map((r) => {
+        var row = {}
+        r.map((v, i) => {
+            if (v.stringValue !== "undefined") {
+                row[cols[i]] = v.stringValue;
+            } else if (v.intValue !== "undefined") {
+                row[cols[i]] = v.intValue;
+            } else if (v.blobValue !== "undefined") {
+                row[cols[i]] = v.blobValue;
+            } else if (v.doubleValue !== "undefined") {
+                row[cols[i]] = v.doubleValue;
+            } else if (v.longValue !== "undefined") {
+                row[cols[i]] = v.longValue;
+            } else if (v.booleanValue !== "undefined") {
+                row[cols[i]] = v.booleanValue;
+            } else if (v.isNull) {
+                row[cols[i]] = null;
+            }
+        })
+        rows.push(row)
+    })
+    return rows;
+}
+
 function getBadAnswer(item) {
     return `I'm sorry. ${item} is not something I know very much about in this skill. ${helpMessage}`;
 }
@@ -480,6 +526,21 @@ function getCardTitle(item) {
 
 function getTopic(item) {
     return item.Topic;
+}
+
+function getTopicID(topic) {
+    if (topic === 'history') {
+        return 1;
+    }
+    else if (topic === 'math') {
+        return 2;
+    }
+    else if (topic === 'geometry') {
+        return 3;
+    }
+    else {
+        return 0;
+    }
 }
 
 function getSpeechDescription(item) {
