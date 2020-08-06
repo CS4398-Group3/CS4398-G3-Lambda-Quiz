@@ -1,0 +1,122 @@
+{
+	"version": "1.0",
+	"session": {
+		"new": false,
+		"sessionId": "amzn1.echo-api.session.03e7d617-b16c-4095-8bab-ee327fbf4687",
+		"application": {
+			"applicationId": "amzn1.ask.skill.9dd0601e-d351-4ffd-9bf8-00b42a2b090b"
+		},
+		"attributes": {
+			"quizScore": 1,
+			"topicID": 1,
+			"topic": "history",
+			"state": "_QUIZ",
+			"counter": 2,
+			"results": [
+				{
+					"question": "When was the Declaration of independence signed",
+					"answer": "1775"
+				},
+				{
+					"question": "How many states does the United States have?",
+					"answer": "50"
+				},
+				{
+					"question": "Was George Washington the first president of the United State? true or false",
+					"answer": "true"
+				}
+			]
+		},
+		"user": {
+			"userId": "amzn1.ask.account.AHUBX4R4I5BHFNMB57BXKUJX6XITCRRWLQV5ODTQO5Z6JSJCKSCGOZ7WKOT3SCHMMEAJEBAOPCOLPZOP37E7YU4MRMR2QCY5JV24HDC473SGWC7VVFQ5P7PJU7DYMQHKG3KBEW2WTQLI5CV2RH3N6ST3LYZ5GTLRYPMFZLJWYYB2VJDN4S3PNRDKRR4LQP262WA7RSNZCZWGIVI"
+		}
+	},
+	"context": {
+		"Viewports": [
+			{
+				"type": "APL",
+				"id": "main",
+				"shape": "RECTANGLE",
+				"dpi": 160,
+				"presentationType": "STANDARD",
+				"canRotate": false,
+				"configuration": {
+					"current": {
+						"video": {
+							"codecs": [
+								"H_264_42",
+								"H_264_41"
+							]
+						},
+						"size": {
+							"type": "DISCRETE",
+							"pixelWidth": 1024,
+							"pixelHeight": 600
+						}
+					}
+				}
+			}
+		],
+		"Viewport": {
+			"experiences": [
+				{
+					"arcMinuteWidth": 246,
+					"arcMinuteHeight": 144,
+					"canRotate": false,
+					"canResize": false
+				}
+			],
+			"shape": "RECTANGLE",
+			"pixelWidth": 1024,
+			"pixelHeight": 600,
+			"dpi": 160,
+			"currentPixelWidth": 1024,
+			"currentPixelHeight": 600,
+			"touch": [
+				"SINGLE"
+			],
+			"video": {
+				"codecs": [
+					"H_264_42",
+					"H_264_41"
+				]
+			}
+		},
+		"System": {
+			"application": {
+				"applicationId": "amzn1.ask.skill.9dd0601e-d351-4ffd-9bf8-00b42a2b090b"
+			},
+			"user": {
+				"userId": "amzn1.ask.account.AHUBX4R4I5BHFNMB57BXKUJX6XITCRRWLQV5ODTQO5Z6JSJCKSCGOZ7WKOT3SCHMMEAJEBAOPCOLPZOP37E7YU4MRMR2QCY5JV24HDC473SGWC7VVFQ5P7PJU7DYMQHKG3KBEW2WTQLI5CV2RH3N6ST3LYZ5GTLRYPMFZLJWYYB2VJDN4S3PNRDKRR4LQP262WA7RSNZCZWGIVI"
+			},
+			"device": {
+				"deviceId": "amzn1.ask.device.AHGSPDVWFZCEZYTAVXQTOPIJFFKE6GQJZHUJOV22ONWSKYG5ZP74ILUFGJ6KDUKONED2ERHKV5IUSPU2WOOG72OHSJKHUWGZHF7RO7OQW32A752PPGB3VTBFTVYUQKIIM2BV6TIINYE77WIDOJJF43JSGFLX5COKM5UPIQ4E7NUTNWHRPM4NU",
+				"supportedInterfaces": {}
+			},
+			"apiEndpoint": "https://api.amazonalexa.com",
+			"apiAccessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ.eyJhdWQiOiJodHRwczovL2FwaS5hbWF6b25hbGV4YS5jb20iLCJpc3MiOiJBbGV4YVNraWxsS2l0Iiwic3ViIjoiYW16bjEuYXNrLnNraWxsLjlkZDA2MDFlLWQzNTEtNGZmZC05YmY4LTAwYjQyYTJiMDkwYiIsImV4cCI6MTU5NjcyMTY4NywiaWF0IjoxNTk2NzIxMzg3LCJuYmYiOjE1OTY3MjEzODcsInByaXZhdGVDbGFpbXMiOnsiY29udGV4dCI6IkFBQUFBQUFBQUFCdVdFRW9Xc2UxY1gwaE15QWxudW92S3dFQUFBQUFBQUI2WXBVKzJqWVd2VnRGVUFPNmpNaUJ0azJBZkJScnRRRkhNT2I0enRmN25rZUlZY0FzYjdHMEgwazRBSjlWMjF2dStEOWRUSWZtVjlLYXVxRGZRbThqL2FaQ3RRaG53RWFhQ0w2dEpERGUzZ1l3L0JJZ202K3JQd044QnM5RHNOcnZxK1V3aWthbDdHanhSUGxHcEtOVGN4K1FmU01aeTlSaUptMkc5T1hjb1g0SzNhd3VjVmk0K3RQMjBRREFMQVRkQlZRWlVDRHU5WHpXSmFwYU5wQ0N1YUpVT3ZqMjhhbGpZejlRa3BDQzVnQUVhRzVwWk9xTGw5ekNGK0psSEFOVjQxVzRXVVZrcGQ4N0YyMFBDSytWZDRRZDIwaGNXaVNHdFJlYzhyWFFROE4xMWNhTUlWbDJOdWVyN2pvTGxKT3g5Z240TWkvejA2LzJRNWhnNFcyQml3cjJ0bW5NdWlScDE2TDAyR3pIVFAxdGgzSktEWU5ZVHJXQkllYzB1NXRmanBiL25HcWkrUkFyNlE9PSIsImNvbnNlbnRUb2tlbiI6bnVsbCwiZGV2aWNlSWQiOiJhbXpuMS5hc2suZGV2aWNlLkFIR1NQRFZXRlpDRVpZVEFWWFFUT1BJSkZGS0U2R1FKWkhVSk9WMjJPTldTS1lHNVpQNzRJTFVGR0o2S0RVS09ORUQyRVJIS1Y1SVVTUFUyV09PRzcyT0hTSktIVVdHWkhGN1JPN09RVzMyQTc1MlBQR0IzVlRCRlRWWVVRS0lJTTJCVjZUSUlOWUU3N1dJRE9KSkY0M0pTR0ZMWDVDT0tNNVVQSVE0RTdOVVROV0hSUE00TlUiLCJ1c2VySWQiOiJhbXpuMS5hc2suYWNjb3VudC5BSFVCWDRSNEk1QkhGTk1CNTdCWEtVSlg2WElUQ1JSV0xRVjVPRFRRTzVaNkpTSkNLU0NHT1o3V0tPVDNTQ0hNTUVBSkVCQU9QQ09MUFpPUDM3RTdZVTRNUk1SMlFDWTVKVjI0SERDNDczU0dXQzdWVkZRNVA3UEpVN0RZTVFIS0czS0JFVzJXVFFMSTVDVjJSSDNONlNUM0xZWjVHVExSWVBNRlpMSldZWUIyVkpETjRTM1BOUkRLUlI0TFFQMjYyV0E3UlNOWkNaV0dJVkkifX0.dXPn2-iI9xTaq2o92l-6F4iVEWw_O8bE7I341XD476P32FEvW-kiMBJI-yBDzOQjv2E-q2O2cYGY-AX9ZSVdyZPRm9T9vxZnU3ouM1pmPRoViFnnkHiyl6qmusSnHRxKvGpfVeOxJo86vTl_aH-p1_DDYSt1l6ktsjf0UGvzmTKB0Xu0CRpuNYYmzqSBPTl_KWKg4YI7MNywthqC8MttYiSvCHaMEKZVaDsIGWqSaE7Jn4Tx7VM2ghJy_i8DPjxjxNYU0359SGZwRos270NO42cOhiAntYvUXYKfUOPs9M0BsspzkZb1523ncww0AaZqBObQF1fCjk_JE8bpO5JgWA"
+		}
+	},
+	"request": {
+		"type": "IntentRequest",
+		"requestId": "amzn1.echo-api.request.e2003aa3-4af4-4fe0-a2cc-249e3de45e5e",
+		"locale": "en-US",
+		"timestamp": "2020-08-06T13:43:07Z",
+		"intent": {
+			"name": "AnswerIntent",
+			"confirmationStatus": "NONE",
+			"slots": {
+				"Answer": {
+					"name": "Answer",
+					"value": "true",
+					"confirmationStatus": "NONE",
+					"source": "USER",
+					"slotValue": {
+						"type": "Simple",
+						"value": "true"
+					}
+				}
+			}
+		}
+	}
+}
