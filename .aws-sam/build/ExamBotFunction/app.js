@@ -93,24 +93,22 @@ const QuizHandler = {
         attributes.state = states.QUIZ;
         attributes.counter = 0;
         attributes.quizScore = 0;
-        attributes.questionID = 0;
+       // attributes.questionID = 0;
 
 
-        //var question = askQuestion(handlerInput);
-        console.log('immediately before db call');
         var results = await queryQuestions(attributes.topicID, attributes.counter);
-        console.log('Immediately after db call');
-        console.log(results);
-        attributes.questionID = results[0].questionID;
-        attributes.question = results[0].question;
-        attributes.answer = results[0].answer;
-        var question = attributes.question;
-        console.log(question);
+        attributes.results = results;
+
+        //attributes.questionID = results[0].questionID;
+        //attributes.question = results[0].question;
+        //attributes.answer = results[0].answer;
+
+        var question = attributes.results[attributes.counter].question;
+        //attributes.counter += 1;
         var speakOutput = startQuizMessage + question;
         var repromptOutput = question;
 
-        const item = attributes.quizItem;
-        const property = attributes.quizProperty;
+
 
         handlerInput.attributesManager.setSessionAttributes(attributes);
         return response.speak(speakOutput)
@@ -142,18 +140,7 @@ const DefinitionHandler = {
                     getCardTitle(item),
                     getTextDescription(item))
             }
-/*
-            if(supportsDisplay(handlerInput)) {
-                const title = getCardTitle(item);
-                const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getTextDescription(item, "<br/>")).getTextContent();
-                response.addRenderTemplateDirective({
-                    type: 'BodyTemplate2',
-                    backButton: 'visible',
-                    title,
-                    textContent: primaryText,
-                });
-            }
-  */
+
             return response.speak(getSpeechDescription(item))
                 .reprompt(repromptSpeech)
                 .getResponse();
@@ -178,20 +165,14 @@ const QuizAnswerHandler = {
             request.type === 'IntentRequest' &&
             request.intent.name === 'AnswerIntent';
     },
-    handle(handlerInput) {
+    async handle(handlerInput) {
         console.log("Inside QuizAnswerHandler - handle");
         const attributes = handlerInput.attributesManager.getSessionAttributes();
         const response = handlerInput.responseBuilder;
-        console.log("Received attributes and response");
 
         let speakOutput = ``;
         let repromptOutput = ``;
-        const item = attributes.quizItem;
-        const property = attributes.quizProperty;
-        console.log("Created item and property");
-        console.log(item, property);
-        const isCorrect = compareSlots(handlerInput.requestEnvelope.request.intent.slots, item[property]);
-        console.log("Created isCorrect");
+        const isCorrect = compareSlots(handlerInput.requestEnvelope.request.intent.slots, attributes.results[attributes.counter].answer);
 
         if (isCorrect) {
             speakOutput = getSpeechCon(true);
@@ -201,54 +182,25 @@ const QuizAnswerHandler = {
             speakOutput = getSpeechCon(false);
         }
 
-        speakOutput += getAnswer(property, item);
+        speakOutput += ' The answer was ' + attributes.results[attributes.counter].answer +'.';
         let question = ``;
-        //IF YOUR QUESTION COUNT IS LESS THAN 10, WE NEED TO ASK ANOTHER QUESTION.
-        if (attributes.counter < 10) {
-            speakOutput += getCurrentScore(attributes.quizScore, attributes.counter);
-            question = askQuestion(handlerInput);
+
+        //IF YOUR QUESTION COUNT IS LESS THAN 2, WE NEED TO ASK ANOTHER QUESTION.
+        if (attributes.counter < 2) {
+            speakOutput += getCurrentScore(attributes.quizScore, attributes.counter) + '. ';
+            attributes.counter += 1;
+
+            question = attributes.results[attributes.counter].question;
             speakOutput += question;
             repromptOutput = question;
-/*
-            if (supportsDisplay(handlerInput)) {
-                const title = `Question #${attributes.counter}`;
-                const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getQuestionWithoutOrdinal(attributes.quizProperty, attributes.quizItem)).getTextContent();
-                const itemList = [];
-                getAndShuffleMultipleChoiceAnswers(attributes.selectedItemIndex, attributes.quizItem, attributes.quizProperty).forEach((x, i) => {
-                    itemList.push(
-                        {
-                            "token" : x,
-                            "textContent" : new Alexa.PlainTextContentHelper().withPrimaryText(x).getTextContent(),
-                        }
-                    );
-                });
-                response.addRenderTemplateDirective({
-                    type : 'ListTemplate1',
-                    token : 'Question',
-                    backButton : 'hidden',
-                    title,
-                    listItems : itemList,
-                });
-            }
+            handlerInput.attributesManager.setSessionAttributes(attributes);
 
- */
             return response.speak(speakOutput)
                 .reprompt(repromptOutput)
                 .getResponse();
         }
         else {
             speakOutput += getFinalScore(attributes.quizScore, attributes.counter) + exitSkillMessage;
-            /*
-            if(supportsDisplay(handlerInput)) {
-                const title = 'Thank you for playing';
-                const primaryText = new Alexa.RichTextContentHelper().withPrimaryText(getFinalScore(attributes.quizScore, attributes.counter)).getTextContent();
-                response.addRenderTemplateDirective({
-                    type : 'BodyTemplate1',
-                    backButton: 'hidden',
-                    title,
-                    textContent: primaryText,
-                });
-            }*/
             return response.speak(speakOutput).getResponse();
         }
     },
@@ -377,7 +329,7 @@ async function queryQuestions(topicID, count){
     let sqlParamsGetQuestions = {
         secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
         resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
-        sql: "SELECT topicid, questionid, question, answer FROM questions where topicid = '" + topicID + "';",// and q.questionOrdinal = '" + count + "';",
+        sql: "SELECT topicid, questionid, question, answer FROM questions where topicid = '" + topicID + "';",
         database: 'ExamBot',
         includeResultMetadata: true
     };
@@ -463,51 +415,6 @@ async function queryTopics(){
     return rows;
 }
 
-async function queryAnswers(topicID){
-    let sqlParamsGetTopics = {
-        secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
-        resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
-        sql: "SELECT topicid, answerid, answer FROM answers where topicid = '" + topicID + "';",
-        database: 'ExamBot',
-        includeResultMetadata: true
-    }
-
-    // run SQL command
-    let data = await rdsDataService.executeStatement(sqlParamsGetTopics).promise()
-
-    var rows = []
-    var cols = []
-
-    // build an array of columns
-    data.columnMetadata.map((v, i) => {
-        cols.push(v.name)
-    });
-
-    // build an array of rows: { key=>value }
-    data.records.map((r) => {
-        var row = {}
-        r.map((v, i) => {
-            if (v.stringValue !== "undefined") {
-                row[cols[i]] = v.stringValue;
-            } else if (v.intValue !== "undefined") {
-                row[cols[i]] = v.intValue;
-            } else if (v.blobValue !== "undefined") {
-                row[cols[i]] = v.blobValue;
-            } else if (v.doubleValue !== "undefined") {
-                row[cols[i]] = v.doubleValue;
-            } else if (v.longValue !== "undefined") {
-                row[cols[i]] = v.longValue;
-            } else if (v.booleanValue !== "undefined") {
-                row[cols[i]] = v.booleanValue;
-            } else if (v.isNull) {
-                row[cols[i]] = null;
-            }
-        })
-        rows.push(row)
-    })
-    return rows;
-}
-
 function getBadAnswer(item) {
     return `I'm sorry. ${item} is not something I know very much about in this skill. ${helpMessage}`;
 }
@@ -553,58 +460,14 @@ function formatCasing(key) {
     return key.split(/(?=[A-Z])/).join(' ');
 }
 
-function getQuestion(counter, property, item) {
-
-    //the Alexa Service will present the correct ordinal (i.e. first, tenth, fifteenth) when the audio response is being delivered
-    return `Here is your ${counter}th question.  What is the ${formatCasing(property)} of ${item.StateName}?`;
-}
-
-// getQuestionWithoutOrdinal returns the question without the ordinal and is
-// used for the echo show.
-function getQuestionWithoutOrdinal(property, item) {
-    return "What is the " + formatCasing(property).toLowerCase() + " of "  + item.StateName + "?";
-}
-
-function getAnswer(property, item) {
-    switch (property) {
-        case 'Abbreviation':
-            return `The ${formatCasing(property)} of ${item.StateName} is <say-as interpret-as='spell-out'>${item[property]}</say-as>. `;
-        default:
-            return `The ${formatCasing(property)} of ${item.StateName} is ${item[property]}. `;
-    }
-}
-
 function getRandom(min, max) {
     return Math.floor((Math.random() * ((max - min) + 1)) + min);
-}
-
-function askQuestion(handlerInput) {
-    console.log("I am in askQuestion()");
-    //GENERATING THE RANDOM QUESTION FROM DATA
-    const random = getRandom(0, data.length - 1);
-    const item = data[random];
-    const propertyArray = Object.getOwnPropertyNames(item);
-    const property = propertyArray[getRandom(1, propertyArray.length - 1)];
-
-    //GET SESSION ATTRIBUTES
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
-
-    //SET QUESTION DATA TO ATTRIBUTES
-    attributes.selectedItemIndex = random;
-    attributes.quizItem = item;
-    attributes.quizProperty = property;
-    attributes.counter += 1;
-
-    //SAVE ATTRIBUTES
-    handlerInput.attributesManager.setSessionAttributes(attributes);
-
-    const question = getQuestion(attributes.counter, property, item);
-    return question;
 }
 
 function compareSlots(slots, value) {
     for (const slot in slots) {
         if (Object.prototype.hasOwnProperty.call(slots, slot) && slots[slot].value !== undefined) {
+            console.log("Inside compareSlots with a valid slot value");
             if (slots[slot].value.toString().toLowerCase() === value.toString().toLowerCase()) {
                 return true;
             }
@@ -651,63 +514,6 @@ function getTextDescription(item) {
     }
     return text;
 }
-
-function getAndShuffleMultipleChoiceAnswers(currentIndex, item, property) {
-    return shuffle(getMultipleChoiceAnswers(currentIndex, item, property));
-}
-
-// This function randomly chooses 3 answers 2 incorrect and 1 correct answer to
-// display on the screen using the ListTemplate. It ensures that the list is unique.
-function getMultipleChoiceAnswers(currentIndex, item, property) {
-
-    // insert the correct answer first
-    let answerList = [item[property]];
-
-    // There's a possibility that we might get duplicate answers
-    // 8 states were founded in 1788
-    // 4 states were founded in 1889
-    // 3 states were founded in 1787
-    // to prevent duplicates we need avoid index collisions and take a sample of
-    // 8 + 4 + 1 = 13 answers (it's not 8+4+3 because later we take the unique
-    // we only need the minimum.)
-    let count = 0
-    let upperBound = 12
-
-    let seen = new Array();
-    seen[currentIndex] = 1;
-
-    while (count < upperBound) {
-        let random = getRandom(0, data.length - 1);
-
-        // only add if we haven't seen this index
-        if ( seen[random] === undefined ) {
-            answerList.push(data[random][property]);
-            count++;
-        }
-    }
-
-    // remove duplicates from the list.
-    answerList = answerList.filter((v, i, a) => a.indexOf(v) === i)
-    // take the first three items from the list.
-    answerList = answerList.slice(0, 3);
-    return answerList;
-}
-
-// This function takes the contents of an array and randomly shuffles it.
-function shuffle(array) {
-    let currentIndex = array.length, temporaryValue, randomIndex;
-
-    while ( 0 !== currentIndex ) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-    }
-    return array;
-}
-
-
 
 /* LAMBDA SETUP */
 exports.handler = skillBuilder
