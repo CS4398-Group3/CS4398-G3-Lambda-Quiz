@@ -93,65 +93,18 @@ const QuizHandler = {
         attributes.state = states.QUIZ;
         attributes.counter = 0;
         attributes.quizScore = 0;
-       // attributes.questionID = 0;
 
-
-        var results = await queryQuestions(attributes.topicID, attributes.counter);
+        var results = await queryQuestions(attributes.topicID);
         attributes.results = results;
 
-        //attributes.questionID = results[0].questionID;
-        //attributes.question = results[0].question;
-        //attributes.answer = results[0].answer;
-
         var question = attributes.results[attributes.counter].question;
-        //attributes.counter += 1;
         var speakOutput = startQuizMessage + question;
         var repromptOutput = question;
-
-
 
         handlerInput.attributesManager.setSessionAttributes(attributes);
         return response.speak(speakOutput)
             .reprompt(repromptOutput)
             .getResponse();
-    }
-};
-
-const DefinitionHandler = {
-    canHandle(handlerInput) {
-        console.log("Inside DefinitionHandler");
-        const attributes = handlerInput.attributesManager.getSessionAttributes();
-        const request = handlerInput.requestEnvelope.request;
-
-        return attributes.state !== states.QUIZ &&
-            request.type === 'IntentRequest' &&
-            request.intent.name === 'AnswerIntent';
-    },
-    handle(handlerInput) {
-        console.log("Inside DefinitionHandler - handle");
-        //GRABBING ALL SLOT VALUES AND RETURNING THE MATCHING DATA OBJECT.
-        const item = getItem(handlerInput.requestEnvelope.request.intent.slots);
-        const response = handlerInput.responseBuilder;
-
-        //IF THE DATA WAS FOUND
-        if (item && item[Object.getOwnPropertyNames(data[0])[0]] !== undefined) {
-            if (useCardsFlag) {
-                response.withStandardCard(
-                    getCardTitle(item),
-                    getTextDescription(item))
-            }
-
-            return response.speak(getSpeechDescription(item))
-                .reprompt(repromptSpeech)
-                .getResponse();
-        }
-        //IF THE DATA WAS NOT FOUND
-        else
-        {
-            return response.speak(getBadAnswer(item))
-                .reprompt(getBadAnswer(item))
-                .getResponse();
-        }
     }
 };
 
@@ -187,9 +140,8 @@ const QuizAnswerHandler = {
 
         //IF YOUR QUESTION COUNT IS LESS THAN 2, WE NEED TO ASK ANOTHER QUESTION.
         if (attributes.counter < 2) {
-            speakOutput += getCurrentScore(attributes.quizScore, attributes.counter) + '. ';
             attributes.counter += 1;
-
+            speakOutput += getCurrentScore(attributes.quizScore, attributes.counter) + '. ';
             question = attributes.results[attributes.counter].question;
             speakOutput += question;
             repromptOutput = question;
@@ -302,29 +254,14 @@ const states = {
 };
 
 const welcomeMessage = `Welcome to ExamBot!  You can ask me what topics you can study, or you can ask me to start a topic quiz.  What would you like to do?`;
-const startQuizMessage = `OK.  I will ask you 10 questions. `;
+const startQuizMessage = `The first question is `;
 const exitSkillMessage = `Thank you for using Exam Bot!  Good Luck!`;
-const repromptSpeech = `What other topic would you like to Study?`;
-const helpMessage = `You can test your knowledge by asking me to start a topic quiz.  What would you like to do?`;
+const helpMessage = `You can test your knowledge by asking me to start a quiz.`;
 const topicMessage = 'Here are the topics I know: ';
 const topicChoiceMessage = 'Okay, I will create a quiz for ';
 const quizPromptMessage = '. When you are ready, say start.';
-const useCardsFlag = true;
 
-/* HELPER FUNCTIONS */
-
-// returns true if the skill is running on a device with a display (show|spot)
-function supportsDisplay(handlerInput) {
-    var hasDisplay =
-        handlerInput.requestEnvelope.context &&
-        handlerInput.requestEnvelope.context.System &&
-        handlerInput.requestEnvelope.context.System.device &&
-        handlerInput.requestEnvelope.context.System.device.supportedInterfaces &&
-        handlerInput.requestEnvelope.context.System.device.supportedInterfaces.Display
-    return hasDisplay;
-}
-
-async function queryQuestions(topicID, count){
+async function queryQuestions(topicID){
 
     let sqlParamsGetQuestions = {
         secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
@@ -415,20 +352,12 @@ async function queryTopics(){
     return rows;
 }
 
-function getBadAnswer(item) {
-    return `I'm sorry. ${item} is not something I know very much about in this skill. ${helpMessage}`;
-}
-
 function getCurrentScore(score, counter) {
     return `Your current score is ${score} out of ${counter}. `;
 }
 
 function getFinalScore(score, counter) {
     return `Your final score is ${score} out of ${counter}. `;
-}
-
-function getCardTitle(item) {
-    return item.StateName;
 }
 
 function getTopic(item) {
@@ -450,16 +379,6 @@ function getTopicID(topic) {
     }
 }
 
-function getSpeechDescription(item) {
-
-    //the Alexa Service will present the correct ordinal (i.e. first, tenth, fifteenth) when the audio response is being delivered
-    return `${item.StateName} is the ${item.StatehoodOrder}th state, admitted to the Union in ${item.StatehoodYear}.  The capital of ${item.StateName} is ${item.Capital}, and the abbreviation for ${item.StateName} is <break strength='strong'/><say-as interpret-as='spell-out'>${item.Abbreviation}</say-as>.  I've added ${item.StateName} to your Alexa app.  Which other state or capital would you like to know about?`;
-}
-
-function formatCasing(key) {
-    return key.split(/(?=[A-Z])/).join(' ');
-}
-
 function getRandom(min, max) {
     return Math.floor((Math.random() * ((max - min) + 1)) + min);
 }
@@ -477,42 +396,9 @@ function compareSlots(slots, value) {
     return false;
 }
 
-function getItem(slots) {
-    const propertyArray = Object.getOwnPropertyNames(data[0]);
-    let slotValue;
-
-    for (const slot in slots) {
-        if (Object.prototype.hasOwnProperty.call(slots, slot) && slots[slot].value !== undefined) {
-            slotValue = slots[slot].value;
-            for (const property in propertyArray) {
-                if (Object.prototype.hasOwnProperty.call(propertyArray, property)) {
-                    const item = data.filter(x => x[propertyArray[property]]
-                        .toString().toLowerCase() === slots[slot].value.toString().toLowerCase());
-                    if (item.length > 0) {
-                        return item[0];
-                    }
-                }
-            }
-        }
-    }
-    return slotValue;
-}
-
 function getSpeechCon(type) {
     if (type) return `<say-as interpret-as='interjection'>${speechConsCorrect[getRandom(0, speechConsCorrect.length - 1)]}! </say-as><break strength='strong'/>`;
     return `<say-as interpret-as='interjection'>${speechConsWrong[getRandom(0, speechConsWrong.length - 1)]} </say-as><break strength='strong'/>`;
-}
-
-
-function getTextDescription(item) {
-    let text = '';
-
-    for (const key in item) {
-        if (Object.prototype.hasOwnProperty.call(item, key)) {
-            text += `${formatCasing(key)}: ${item[key]}\n`;
-        }
-    }
-    return text;
 }
 
 /* LAMBDA SETUP */
@@ -522,7 +408,6 @@ exports.handler = skillBuilder
         TopicRequestHandler,
         TopicChoiceHandler,
         QuizHandler,
-        DefinitionHandler,
         QuizAnswerHandler,
         RepeatHandler,
         HelpHandler,
