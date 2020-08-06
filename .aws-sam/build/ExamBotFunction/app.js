@@ -135,7 +135,7 @@ const QuizAnswerHandler = {
             speakOutput = getSpeechCon(false);
         }
 
-        speakOutput += ' The answer was ' + attributes.results[attributes.counter].answer +'.';
+        speakOutput += 'The answer was ' + attributes.results[attributes.counter].answer +'. ';
         let question = ``;
 
         //IF YOUR QUESTION COUNT IS LESS THAN 2, WE NEED TO ASK ANOTHER QUESTION.
@@ -143,8 +143,8 @@ const QuizAnswerHandler = {
             attributes.counter += 1;
             speakOutput += getCurrentScore(attributes.quizScore, attributes.counter) + '. ';
             question = attributes.results[attributes.counter].question;
-            speakOutput += question;
-            repromptOutput = question;
+            speakOutput += question + "?";
+            repromptOutput = question + "?";
             handlerInput.attributesManager.setSessionAttributes(attributes);
 
             return response.speak(speakOutput)
