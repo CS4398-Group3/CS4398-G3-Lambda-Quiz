@@ -377,7 +377,7 @@ async function queryQuestions(topicID, count){
     let sqlParamsGetQuestions = {
         secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
         resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
-        sql: "SELECT q.topicid, q.questionid, q.question FROM question q where q.topicid = '" + topicID + "';",// and q.questionOrdinal = '" + count + "';",
+        sql: "SELECT topicid, questionid, question, answer FROM questions where topicid = '" + topicID + "';",// and q.questionOrdinal = '" + count + "';",
         database: 'ExamBot',
         includeResultMetadata: true
     };
