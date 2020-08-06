@@ -376,7 +376,7 @@ async function queryQuestions(topic, count){
     let sqlParamsGetQuestions = {
         secretArn: 'arn:aws:secretsmanager:us-east-1:637995029313:secret:rds-db-credentials/cluster-TX2YL6M77LBJIYZYQYULWL6OTI/admin-1j6vEM',
         resourceArn: 'arn:aws:rds:us-east-1:637995029313:cluster:database-1',
-        sql: "SELECT q.topicid, q.questionid, q.questionOrdinal, q.question, q.answer FROM questions q inner join topics where topicName = '" + topic + "' and q.questionOrdinal = '" + count + "';",
+        sql: "SELECT q.topicid, q.questionid, q.question FROM question q inner join topics where topicName = '" + topic + "';",// and q.questionOrdinal = '" + count + "';",
         database: 'ExamBot',
         includeResultMetadata: true
     };
@@ -397,6 +397,8 @@ async function queryQuestions(topic, count){
         r.map((v, i) => {
             if (v.stringValue !== "undefined") {
                 row[cols[i]] = v.stringValue;
+            } else if (v.intValue !== "undefined") {
+                row[cols[i]] = v.intValue;
             } else if (v.blobValue !== "undefined") {
                 row[cols[i]] = v.blobValue;
             } else if (v.doubleValue !== "undefined") {
@@ -441,6 +443,8 @@ async function queryTopics(){
         r.map((v, i) => {
             if (v.stringValue !== "undefined") {
                 row[cols[i]] = v.stringValue;
+            } else if (v.intValue !== "undefined") {
+                row[cols[i]] = v.intValue;
             } else if (v.blobValue !== "undefined") {
                 row[cols[i]] = v.blobValue;
             } else if (v.doubleValue !== "undefined") {
